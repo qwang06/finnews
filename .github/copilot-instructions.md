@@ -4,12 +4,37 @@
 
 The objective of this application is to retrieve finance news and information, then utilize a finance-trained LLM model to generate detailed reports.
 
+## Architecture
+
+This is an **Nx monorepo** with a clear separation between frontend and backend:
+
+- **Frontend**: React application (TypeScript)
+- **Backend**: Python application
+- **Monorepo Tool**: Nx for task orchestration, caching, and dependency management
+
 ## Environment & Tech Stack
+
+### Frontend
+
+- **Framework**: React 19 with React Router 7
+- **Language**: TypeScript
+- **Build Tool**: Vite
+- **Styling**: Tailwind CSS with shadcn/ui components
+- **Package Manager**: npm
+- **Testing**: Vitest, Playwright (E2E)
+
+### Backend
 
 - **Language**: Python
 - **Environment Management**: `venv`
 - **Package Manager**: `pip`
 - **Data Sources**: External APIs and Web Scraping
+
+### Monorepo Management
+
+- **Tool**: Nx
+- **Task Execution**: Use `nx` commands (e.g., `nx build`, `nx test`, `nx run-many`)
+- **Project Structure**: Apps and libraries under `apps/` directory
 
 ## Core Principles
 
