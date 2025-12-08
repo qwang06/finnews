@@ -14,6 +14,8 @@ import os
 
 from adapters.tiingo_adapter import TiingoClient
 from adapters.github_adapter import GitHubAdapter
+from services.ticker_sync_service import ticker_sync_service
+from ticker_repository import TickerRepository
 from db_config import db_config
 
 # Load environment variables from .env file
@@ -144,25 +146,22 @@ async def analyze_ticker(request: TickerRequest):
 @app.get("/api/tickers/nasdaq", response_model=Dict[str, Any])
 async def get_ticker_list():
     """
-    Retrieve the list of valid ticker symbols from GitHub repository.
+    Retrieve the list of NASDAQ ticker symbols from database.
 
-    Fetches the JSON file containing ticker symbols and their metadata.
+    Returns ticker symbols and their metadata stored in the database.
     """
     try:
-        github = GitHubAdapter()
-        tickers_data = github.get_json_file(
-            owner="rreichel3",
-            repo="US-Stock-Symbols",
-            file_path="nasdaq/nasdaq_full_tickers.json"
-        )
+        repo = TickerRepository()
+        tickers_data = repo.get_tickers_by_exchange("NASDAQ")
 
         return {
             "status": "success",
-            "message": "Ticker list retrieved successfully",
+            "message": "NASDAQ ticker list retrieved successfully",
+            "count": len(tickers_data),
             "data": tickers_data
         }
 
-    except ValueError as e:
+    except Exception as e:
         raise HTTPException(
             status_code=500,
             detail=f"Failed to fetch ticker list: {str(e)}"
@@ -172,25 +171,22 @@ async def get_ticker_list():
 @app.get("/api/tickers/nyse", response_model=Dict[str, Any])
 async def get_nyse_ticker_list():
     """
-    Retrieve the list of valid NYSE ticker symbols from GitHub repository.
+    Retrieve the list of NYSE ticker symbols from database.
 
-    Fetches the JSON file containing ticker symbols and their metadata.
+    Returns ticker symbols and their metadata stored in the database.
     """
     try:
-        github = GitHubAdapter()
-        tickers_data = github.get_json_file(
-            owner="rreichel3",
-            repo="US-Stock-Symbols",
-            file_path="nyse/nyse_full_tickers.json"
-        )
+        repo = TickerRepository()
+        tickers_data = repo.get_tickers_by_exchange("NYSE")
 
         return {
             "status": "success",
-            "message": "Ticker list retrieved successfully",
+            "message": "NYSE ticker list retrieved successfully",
+            "count": len(tickers_data),
             "data": tickers_data
         }
 
-    except ValueError as e:
+    except Exception as e:
         raise HTTPException(
             status_code=500,
             detail=f"Failed to fetch ticker list: {str(e)}"
@@ -200,25 +196,22 @@ async def get_nyse_ticker_list():
 @app.get("/api/tickers/amex", response_model=Dict[str, Any])
 async def get_amex_ticker_list():
     """
-    Retrieve the list of valid AMEX ticker symbols from GitHub repository.
+    Retrieve the list of AMEX ticker symbols from database.
 
-    Fetches the JSON file containing ticker symbols and their metadata.
+    Returns ticker symbols and their metadata stored in the database.
     """
     try:
-        github = GitHubAdapter()
-        tickers_data = github.get_json_file(
-            owner="rreichel3",
-            repo="US-Stock-Symbols",
-            file_path="amex/amex_full_tickers.json"
-        )
+        repo = TickerRepository()
+        tickers_data = repo.get_tickers_by_exchange("AMEX")
 
         return {
             "status": "success",
-            "message": "Ticker list retrieved successfully",
+            "message": "AMEX ticker list retrieved successfully",
+            "count": len(tickers_data),
             "data": tickers_data
         }
 
-    except ValueError as e:
+    except Exception as e:
         raise HTTPException(
             status_code=500,
             detail=f"Failed to fetch ticker list: {str(e)}"
@@ -228,30 +221,16 @@ async def get_amex_ticker_list():
 @app.get("/api/tickers", response_model=Dict[str, Any])
 async def get_all_ticker_lists():
     """
-    Retrieve combined list of valid ticker symbols from NASDAQ, NYSE, and AMEX.
+    Retrieve combined list of ticker symbols from NASDAQ, NYSE, and AMEX.
 
-    Fetches JSON files from GitHub repository and merges them.
+    Fetches ticker data from database and groups by exchange.
     """
     try:
-        github = GitHubAdapter()
+        repo = TickerRepository()
 
-        nasdaq_data = github.get_json_file(
-            owner="rreichel3",
-            repo="US-Stock-Symbols",
-            file_path="nasdaq/nasdaq_full_tickers.json"
-        )
-
-        nyse_data = github.get_json_file(
-            owner="rreichel3",
-            repo="US-Stock-Symbols",
-            file_path="nyse/nyse_full_tickers.json"
-        )
-
-        amex_data = github.get_json_file(
-            owner="rreichel3",
-            repo="US-Stock-Symbols",
-            file_path="amex/amex_full_tickers.json"
-        )
+        nasdaq_data = repo.get_tickers_by_exchange("NASDAQ")
+        nyse_data = repo.get_tickers_by_exchange("NYSE")
+        amex_data = repo.get_tickers_by_exchange("AMEX")
 
         combined_data = {
             "nasdaq": nasdaq_data,
@@ -259,16 +238,84 @@ async def get_all_ticker_lists():
             "amex": amex_data
         }
 
+        total_count = len(nasdaq_data) + len(nyse_data) + len(amex_data)
+
         return {
             "status": "success",
             "message": "Combined ticker lists retrieved successfully",
+            "total_count": total_count,
+            "counts": {
+                "nasdaq": len(nasdaq_data),
+                "nyse": len(nyse_data),
+                "amex": len(amex_data)
+            },
             "data": combined_data
         }
 
-    except ValueError as e:
+    except Exception as e:
         raise HTTPException(
             status_code=500,
             detail=f"Failed to fetch ticker lists: {str(e)}"
+        )
+
+
+@app.post("/api/tickers/sync")
+async def sync_tickers(exchange: Optional[str] = None):
+    """
+    Synchronize ticker data from GitHub repository to database.
+
+    Optionally sync a specific exchange by providing exchange parameter.
+    If no exchange specified, syncs all exchanges (NASDAQ, NYSE, AMEX).
+
+    Args:
+        exchange: Optional exchange code (NASDAQ, NYSE, AMEX)
+
+    Returns:
+        Sync results with statistics
+    """
+    try:
+        if exchange:
+            result = ticker_sync_service.sync_specific_exchange(exchange)
+        else:
+            result = ticker_sync_service.sync_all_exchanges()
+
+        return result
+
+    except RuntimeError as e:
+        raise HTTPException(
+            status_code=409,
+            detail=str(e)
+        )
+    except ValueError as e:
+        raise HTTPException(
+            status_code=400,
+            detail=str(e)
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Sync failed: {str(e)}"
+        )
+
+
+@app.get("/api/tickers/sync/status")
+async def get_sync_status():
+    """
+    Get current ticker synchronization status.
+
+    Returns:
+        Current sync status including progress and statistics
+    """
+    try:
+        status = ticker_sync_service.get_sync_status()
+        return {
+            "status": "success",
+            "data": status
+        }
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to get sync status: {str(e)}"
         )
 
 
