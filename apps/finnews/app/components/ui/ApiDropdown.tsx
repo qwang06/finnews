@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Combobox, ComboboxOption, ComboboxProps } from './combobox';
+import { Combobox, ComboboxOption, ComboboxProps } from './Combobox';
 
 export interface ApiDropdownProps<T = unknown>
   extends Omit<ComboboxProps, 'options'> {

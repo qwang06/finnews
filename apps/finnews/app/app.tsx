@@ -1,9 +1,7 @@
 import { useState } from 'react';
-import { Button } from './components/ui/button';
-import { Input } from './components/ui/input';
-import { Label } from './components/ui/label';
+import { Button } from './components/ui/Button';
 
-import TickerDropdownExample from './routes/ticker-dropdown-example';
+import TickerDropdown from './components/TickerDropdown';
 
 interface TickerResponse {
   ticker: string;
@@ -17,6 +15,11 @@ export function App() {
   const [loading, setLoading] = useState(false);
   const [response, setResponse] = useState<TickerResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  const handleTickerChange = (value: string) => {
+    console.log('Selected ticker:', value);
+    setTicker(value);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -48,9 +51,9 @@ export function App() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="w-full max-w-md p-8">
-        <div className="space-y-6">
+    <div className="min-h-screen bg-background">
+      <div className="container mx-auto px-4 py-8">
+        <div className="max-w-md mx-auto space-y-6">
           <div className="space-y-2 text-center">
             <h1 className="text-3xl font-bold tracking-tight">FinNews</h1>
             <p className="text-muted-foreground">
@@ -59,21 +62,15 @@ export function App() {
           </div>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="ticker">Ticker</Label>
-              <Input
-                id="ticker"
-                type="text"
-                placeholder="e.g., AAPL"
-                value={ticker}
-                onChange={(e) => setTicker(e.target.value)}
-                required
+              <TickerDropdown
+                selectedTicker={ticker}
+                onTickerClick={handleTickerChange}
               />
             </div>
             <Button type="submit" className="w-full" disabled={loading}>
               {loading ? 'Analyzing...' : 'Submit'}
             </Button>
           </form>
-          <TickerDropdownExample />
 
           {error && (
             <div className="p-4 bg-destructive/10 border border-destructive rounded-md">

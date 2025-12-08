@@ -1,6 +1,6 @@
 import * as React from 'react';
-import { ApiDropdown } from '../components/ui/api-dropdown';
-import { ComboboxOption } from '../components/ui/combobox';
+import { ApiDropdown } from './ui/ApiDropdown';
+import { ComboboxOption } from './ui/Combobox';
 
 // Example ticker data structure from API
 interface TickerData {

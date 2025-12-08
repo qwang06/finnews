@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Button } from './button';
+import { Button } from './Button';
 import {
   Command,
   CommandEmpty,
@@ -7,8 +7,8 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from './command';
-import { Popover, PopoverContent, PopoverTrigger } from './popover';
+} from './Command';
+import { Popover, PopoverContent, PopoverTrigger } from './Popover';
 import { cn } from '../../lib/utils';
 
 export interface ComboboxOption {
@@ -65,7 +65,7 @@ export function Combobox({
   const displayOptions = filteredOptions.slice(0, maxDisplayItems);
   const hasMore = filteredOptions.length > maxDisplayItems;
 
-  const handleSelect = (currentValue: string) => {
+  const handleClick = (currentValue: string) => {
     const newValue = currentValue === value ? '' : currentValue;
     onValueChange?.(newValue);
     setOpen(false);
@@ -109,13 +109,15 @@ export function Combobox({
             onChange={(e) => setSearchQuery(e.target.value)}
           />
           <CommandList>
-            <CommandEmpty>{emptyMessage}</CommandEmpty>
+            {displayOptions.length === 0 && (
+              <CommandEmpty>{emptyMessage}</CommandEmpty>
+            )}
             <CommandGroup>
               {displayOptions.map((option) => (
                 <CommandItem
                   key={option.value}
                   selected={option.value === value}
-                  onSelect={() => handleSelect(option.value)}
+                  onClick={() => handleClick(option.value)}
                 >
                   {renderOption ? (
                     renderOption(option)

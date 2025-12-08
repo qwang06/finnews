@@ -8,6 +8,7 @@ import {
   type LinksFunction,
 } from 'react-router';
 
+import { Navigation } from './components/Navigation';
 import styles from '../styles.css?url';
 
 export const meta: MetaFunction = () => [
@@ -40,6 +41,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body>
+        <Navigation />
         {children}
         <ScrollRestoration />
         <Scripts />

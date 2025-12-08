@@ -232,11 +232,7 @@ async def get_all_ticker_lists():
         nyse_data = repo.get_tickers_by_exchange("NYSE")
         amex_data = repo.get_tickers_by_exchange("AMEX")
 
-        combined_data = {
-            "nasdaq": nasdaq_data,
-            "nyse": nyse_data,
-            "amex": amex_data
-        }
+        combined_data = nasdaq_data + nyse_data + amex_data
 
         total_count = len(nasdaq_data) + len(nyse_data) + len(amex_data)
 
