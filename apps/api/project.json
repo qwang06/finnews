@@ -39,6 +39,14 @@
         "cwd": "apps/api"
       },
       "description": "Run pylint on the API code"
+    },
+    "init-db": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "powershell -Command \"& { .\\venv\\Scripts\\Activate.ps1; py init_db.py }\"",
+        "cwd": "apps/api"
+      },
+      "description": "Initialize database schema and create tables"
     }
   },
   "tags": ["type:api", "scope:backend"]

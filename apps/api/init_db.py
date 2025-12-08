@@ -32,7 +32,7 @@ def init_database():
         cursor.execute(schema_sql)
         conn.commit()
 
-        print("✓ Database schema created successfully")
+        print("[OK] Database schema created successfully")
 
         # Verify tables were created
         cursor.execute("""
@@ -54,10 +54,10 @@ def init_database():
         return True
 
     except psycopg2.Error as e:
-        print(f"✗ Database error: {e}")
+        print(f"[ERROR] Database error: {e}")
         return False
     except Exception as e:
-        print(f"✗ Error: {e}")
+        print(f"[ERROR] Error: {e}")
         return False
 
 
@@ -85,7 +85,7 @@ def drop_all_tables():
         cursor.execute(drop_sql)
         conn.commit()
 
-        print("✓ All tables dropped")
+        print("[OK] All tables dropped")
 
         cursor.close()
         conn.close()
@@ -93,7 +93,7 @@ def drop_all_tables():
         return True
 
     except psycopg2.Error as e:
-        print(f"✗ Database error: {e}")
+        print(f"[ERROR] Database error: {e}")
         return False
 
 

@@ -1,3 +1,6 @@
-import { type RouteConfig, index } from '@react-router/dev/routes';
+import { type RouteConfig, index, route } from '@react-router/dev/routes';
 
-export default [index('./app.tsx')] satisfies RouteConfig;
+export default [
+  index('./app.tsx'),
+  route('ticker-sync', './routes/ticker-sync.tsx'),
+] satisfies RouteConfig;

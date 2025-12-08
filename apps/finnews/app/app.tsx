@@ -3,6 +3,8 @@ import { Button } from './components/ui/button';
 import { Input } from './components/ui/input';
 import { Label } from './components/ui/label';
 
+import TickerDropdownExample from './routes/ticker-dropdown-example';
+
 interface TickerResponse {
   ticker: string;
   message: string;
@@ -71,6 +73,7 @@ export function App() {
               {loading ? 'Analyzing...' : 'Submit'}
             </Button>
           </form>
+          <TickerDropdownExample />
 
           {error && (
             <div className="p-4 bg-destructive/10 border border-destructive rounded-md">
