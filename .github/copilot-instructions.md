@@ -120,11 +120,12 @@ This is an **Nx monorepo** with a clear separation between frontend and backend:
 
 **Tests**
 
-- One assert per test.
-- Readable.
-- Fast.
-- Independent.
-- Repeatable.
+- **Keep tests concise**: Avoid unnecessary duplication. Combine related test cases when props/setup don't change between tests.
+- **One logical assertion per test**: Group related assertions that test the same behavior.
+- **Readable**: Tests should clearly communicate intent.
+- **Fast**: Tests should execute quickly.
+- **Independent**: Tests should not depend on each other.
+- **Repeatable**: Tests should produce consistent results.
 
 **Code Smells to Avoid**
 
