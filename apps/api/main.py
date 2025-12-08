@@ -225,6 +225,53 @@ async def get_amex_ticker_list():
         )
 
 
+@app.get("/api/tickers", response_model=Dict[str, Any])
+async def get_all_ticker_lists():
+    """
+    Retrieve combined list of valid ticker symbols from NASDAQ, NYSE, and AMEX.
+
+    Fetches JSON files from GitHub repository and merges them.
+    """
+    try:
+        github = GitHubAdapter()
+
+        nasdaq_data = github.get_json_file(
+            owner="rreichel3",
+            repo="US-Stock-Symbols",
+            file_path="nasdaq/nasdaq_full_tickers.json"
+        )
+
+        nyse_data = github.get_json_file(
+            owner="rreichel3",
+            repo="US-Stock-Symbols",
+            file_path="nyse/nyse_full_tickers.json"
+        )
+
+        amex_data = github.get_json_file(
+            owner="rreichel3",
+            repo="US-Stock-Symbols",
+            file_path="amex/amex_full_tickers.json"
+        )
+
+        combined_data = {
+            "nasdaq": nasdaq_data,
+            "nyse": nyse_data,
+            "amex": amex_data
+        }
+
+        return {
+            "status": "success",
+            "message": "Combined ticker lists retrieved successfully",
+            "data": combined_data
+        }
+
+    except ValueError as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to fetch ticker lists: {str(e)}"
+        )
+
+
 @app.get("/health")
 async def health_check():
     """Detailed health check endpoint."""

@@ -57,9 +57,9 @@ export function App() {
           </div>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="ticket">Ticker</Label>
+              <Label htmlFor="ticker">Ticker</Label>
               <Input
-                id="ticket"
+                id="ticker"
                 type="text"
                 placeholder="e.g., AAPL"
                 value={ticker}
