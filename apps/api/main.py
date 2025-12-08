@@ -7,16 +7,37 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 from typing import Optional, Dict, Any
+from contextlib import asynccontextmanager
 import uvicorn
 from dotenv import load_dotenv
 import os
 
 from tiingo_adapter import TiingoClient
+from db_config import db_config
 
 # Load environment variables from .env file
 load_dotenv()
 
 
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Manage application lifespan events."""
+    # Startup
+    try:
+        db_config.initialize_pool(min_conn=2, max_conn=10)
+        if db_config.test_connection():
+            print("[OK] Database connection successful")
+        else:
+            print("[WARNING] Database connection test failed")
+    except Exception as e:
+        print(f"[WARNING] Database initialization error: {e}")
+        print("API will start but database features may not work")
+    
+    yield
+    
+    # Shutdown
+    db_config.close_pool()
+    print("[OK] Database connections closed")
 class TickerRequest(BaseModel):
     """Request model for ticker submissions."""
     ticker: str = Field(..., min_length=1, max_length=10, description="Stock ticker symbol")
@@ -38,7 +59,8 @@ class TickerResponse(BaseModel):
 app = FastAPI(
     title="FinNews API",
     description="API for retrieving finance news and generating reports",
-    version="1.0.0"
+    version="1.0.0",
+    lifespan=lifespan
 )
 
 # Configure CORS to allow frontend access
