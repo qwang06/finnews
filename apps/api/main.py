@@ -12,7 +12,8 @@ import uvicorn
 from dotenv import load_dotenv
 import os
 
-from tiingo_adapter import TiingoClient
+from adapters.tiingo_adapter import TiingoClient
+from adapters.github_adapter import GitHubAdapter
 from db_config import db_config
 
 # Load environment variables from .env file
@@ -32,9 +33,9 @@ async def lifespan(app: FastAPI):
     except Exception as e:
         print(f"[WARNING] Database initialization error: {e}")
         print("API will start but database features may not work")
-    
+
     yield
-    
+
     # Shutdown
     db_config.close_pool()
     print("[OK] Database connections closed")
@@ -137,6 +138,90 @@ async def analyze_ticker(request: TickerRequest):
         raise HTTPException(
             status_code=500,
             detail=f"Failed to fetch ticker data: {str(e)}"
+        )
+
+
+@app.get("/api/tickers/nasdaq", response_model=Dict[str, Any])
+async def get_ticker_list():
+    """
+    Retrieve the list of valid ticker symbols from GitHub repository.
+
+    Fetches the JSON file containing ticker symbols and their metadata.
+    """
+    try:
+        github = GitHubAdapter()
+        tickers_data = github.get_json_file(
+            owner="rreichel3",
+            repo="US-Stock-Symbols",
+            file_path="nasdaq/nasdaq_full_tickers.json"
+        )
+
+        return {
+            "status": "success",
+            "message": "Ticker list retrieved successfully",
+            "data": tickers_data
+        }
+
+    except ValueError as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to fetch ticker list: {str(e)}"
+        )
+
+
+@app.get("/api/tickers/nyse", response_model=Dict[str, Any])
+async def get_nyse_ticker_list():
+    """
+    Retrieve the list of valid NYSE ticker symbols from GitHub repository.
+
+    Fetches the JSON file containing ticker symbols and their metadata.
+    """
+    try:
+        github = GitHubAdapter()
+        tickers_data = github.get_json_file(
+            owner="rreichel3",
+            repo="US-Stock-Symbols",
+            file_path="nyse/nyse_full_tickers.json"
+        )
+
+        return {
+            "status": "success",
+            "message": "Ticker list retrieved successfully",
+            "data": tickers_data
+        }
+
+    except ValueError as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to fetch ticker list: {str(e)}"
+        )
+
+
+@app.get("/api/tickers/amex", response_model=Dict[str, Any])
+async def get_amex_ticker_list():
+    """
+    Retrieve the list of valid AMEX ticker symbols from GitHub repository.
+
+    Fetches the JSON file containing ticker symbols and their metadata.
+    """
+    try:
+        github = GitHubAdapter()
+        tickers_data = github.get_json_file(
+            owner="rreichel3",
+            repo="US-Stock-Symbols",
+            file_path="amex/amex_full_tickers.json"
+        )
+
+        return {
+            "status": "success",
+            "message": "Ticker list retrieved successfully",
+            "data": tickers_data
+        }
+
+    except ValueError as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to fetch ticker list: {str(e)}"
         )
 
 
