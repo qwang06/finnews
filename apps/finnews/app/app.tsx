@@ -17,7 +17,6 @@ export function App() {
   const [error, setError] = useState<string | null>(null);
 
   const handleTickerChange = (value: string) => {
-    console.log('Selected ticker:', value);
     setTicker(value);
   };
 
