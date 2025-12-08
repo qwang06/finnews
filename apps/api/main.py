@@ -6,8 +6,15 @@ Handles ticker symbol submissions and returns finance news reports.
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
-from typing import Optional
+from typing import Optional, Dict, Any
 import uvicorn
+from dotenv import load_dotenv
+import os
+
+from tiingo_adapter import TiingoClient
+
+# Load environment variables from .env file
+load_dotenv()
 
 
 class TickerRequest(BaseModel):
@@ -19,8 +26,13 @@ class TickerResponse(BaseModel):
     """Response model for ticker analysis."""
     ticker: str
     message: str
-    news_summary: Optional[str] = None
     status: str
+    company_name: Optional[str] = None
+    description: Optional[str] = None
+    exchange: Optional[str] = None
+    start_date: Optional[str] = None
+    end_date: Optional[str] = None
+    latest_price: Optional[Dict[str, Any]] = None
 
 
 app = FastAPI(
@@ -56,10 +68,10 @@ async def root():
 @app.post("/api/ticker", response_model=TickerResponse)
 async def analyze_ticker(request: TickerRequest):
     """
-    Analyze a ticker symbol and return news/report.
+    Analyze a ticker symbol and return company information and latest price.
 
-    This is a simple implementation that will be enhanced later
-    with actual news retrieval and LLM-based report generation.
+    Fetches real-time data from Tiingo API including company metadata
+    and the most recent price information.
     """
     ticker = request.ticker.upper()
 
@@ -70,15 +82,40 @@ async def analyze_ticker(request: TickerRequest):
             detail="Ticker symbol must contain only letters and numbers"
         )
 
-    # TODO: Implement actual news retrieval and LLM analysis
-    # For now, return a mock response
-    return TickerResponse(
-        ticker=ticker,
-        message=f"Successfully received ticker: {ticker}",
-        news_summary=f"News analysis for {ticker} will be displayed here. "
-                     f"This will be replaced with actual news data and AI-generated reports.",
-        status="success"
-    )
+    try:
+        # Initialize Tiingo client
+        tiingo = TiingoClient()
+
+        # Fetch ticker metadata
+        metadata = tiingo.get_ticker_metadata(ticker)
+
+        # Fetch latest price
+        latest_price = tiingo.get_latest_price(ticker)
+
+        return TickerResponse(
+            ticker=ticker,
+            message=f"Successfully retrieved data for {ticker}",
+            status="success",
+            company_name=metadata.get("name"),
+            description=metadata.get("description"),
+            exchange=metadata.get("exchangeCode"),
+            start_date=metadata.get("startDate"),
+            end_date=metadata.get("endDate"),
+            latest_price=latest_price
+        )
+
+    except ValueError as e:
+        # Handle invalid ticker or no data
+        raise HTTPException(
+            status_code=404,
+            detail=str(e)
+        )
+    except Exception as e:
+        # Handle API errors
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to fetch ticker data: {str(e)}"
+        )
 
 
 @app.get("/health")
