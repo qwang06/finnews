@@ -1,4 +1,93 @@
-# Finnews
+# FinNews
+
+Finance news retrieval and AI-powered report generation application.
+
+## Project Overview
+
+This application retrieves finance news and information, then utilizes a finance-trained LLM model to generate detailed reports.
+
+### Architecture
+
+**Nx Monorepo** with clear separation:
+- **Frontend**: React 19 + TypeScript + Vite + Tailwind CSS
+- **Backend**: Python FastAPI
+- **Monorepo Tool**: Nx for task orchestration and caching
+
+## Quick Start
+
+### Prerequisites
+
+- Node.js (v18 or higher)
+- Python 3.8 or higher
+- npm
+
+### Setup
+
+1. **Install frontend dependencies:**
+   ```bash
+   npm install
+   ```
+
+2. **Setup Python backend:**
+   ```bash
+   nx run api:setup
+   ```
+   This creates a virtual environment and installs all Python dependencies.
+
+### Running the Application
+
+1. **Start the backend API:**
+   ```bash
+   nx serve api
+   ```
+   API runs at `http://localhost:8725`
+
+2. **Start the frontend** (in a new terminal):
+   ```bash
+   nx serve finnews
+   ```
+   Frontend runs at `http://localhost:5173`
+
+3. **View API documentation:**
+   Open `http://localhost:8725/docs`
+
+## Project Structure
+
+```
+apps/
+  ├── finnews/          # React frontend application
+  │   ├── app/          # Application routes and components
+  │   └── ...
+  ├── finnews-e2e/      # E2E tests
+  └── api/              # Python FastAPI backend
+      ├── main.py       # FastAPI application
+      ├── venv/         # Virtual environment (created on setup)
+      └── ...
+```
+
+## Available Commands
+
+### Frontend
+- `nx serve finnews` - Start dev server
+- `nx build finnews` - Production build
+- `nx test finnews` - Run tests
+- `nx lint finnews` - Lint code
+
+### Backend
+- `nx run api:setup` - Initial setup (create venv + install deps)
+- `nx serve api` - Start API server
+- `nx run api:install` - Install/update dependencies
+- `nx run api:lint` - Lint Python code
+
+### Workspace
+- `npx nx graph` - View project dependency graph
+- `npx nx show project <name>` - Show project details
+
+## Development
+
+See individual README files for more details:
+- [Frontend README](apps/finnews/README.md)
+- [Backend API README](apps/api/README.md)
 
 <a alt="Nx logo" href="https://nx.dev" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-logo.png" width="45"></a>
 
@@ -6,12 +95,11 @@
 
 [Learn more about this workspace setup and its capabilities](https://nx.dev/getting-started/tutorials/react-monorepo-tutorial?utm_source=nx_project&amp;utm_medium=readme&amp;utm_campaign=nx_projects) or run `npx nx graph` to visually explore what was created. Now, let's get you up to speed!
 
-## Finish your CI setup
+---
 
-[Click here to finish setting up your workspace!](https://cloud.nx.app/connect/hopRnYEZro)
+## Nx Workspace Documentation
 
-
-## Run tasks
+### Run tasks
 
 To run the dev server for your app, use:
 

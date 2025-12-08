@@ -6,6 +6,7 @@
     "start": "nx start finnews",
     "dev": "nx dev finnews",
     "build": "nx build finnews",
+    "api": "nx serve api",
     "test": "nx test finnews",
     "test:watch": "nx test finnews --watch",
     "lint": "nx lint finnews",

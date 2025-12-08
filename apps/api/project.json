@@ -1,0 +1,45 @@
+{
+  "name": "api",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "sourceRoot": "apps/api",
+  "targets": {
+    "setup": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          "py -m venv venv",
+          "powershell -ExecutionPolicy Bypass -File apps/api/setup.ps1"
+        ],
+        "cwd": "apps/api",
+        "parallel": false
+      },
+      "description": "Create virtual environment and install dependencies"
+    },
+    "serve": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "powershell -Command \"& { .\\venv\\Scripts\\Activate.ps1; py -m uvicorn main:app --reload --host 0.0.0.0 --port 8725 }\"",
+        "cwd": "apps/api"
+      },
+      "description": "Start the FastAPI development server"
+    },
+    "install": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "powershell -Command \"& { .\\venv\\Scripts\\Activate.ps1; py -m pip install -r requirements.txt }\"",
+        "cwd": "apps/api"
+      },
+      "description": "Install Python dependencies in virtual environment"
+    },
+    "lint": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "powershell -Command \"& { .\\venv\\Scripts\\Activate.ps1; py -m pylint main.py }\"",
+        "cwd": "apps/api"
+      },
+      "description": "Run pylint on the API code"
+    }
+  },
+  "tags": ["type:api", "scope:backend"]
+}
